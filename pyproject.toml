@@ -1,0 +1,37 @@
+[project]
+name = "stadvdb-mco2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "CoolTrainerEX", email = "cooltrainerex@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.165.0",
+    "loguru>=0.8.0",
+    "pydantic>=2.14.4",
+    "pydantic-settings>=2.16.3",
+    "sqlmodel>=0.0.50",
+]
+
+[project.scripts]
+stadvdb-mco2 = "stadvdb_mco2:main"
+
+[build-system]
+requires = ["uv_build>=0.12.21,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+    "sphinx>=9.2.0",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.fastapi]
+entrypoint = "stadvdb-mco2:app"
