@@ -7,7 +7,9 @@ authors = [{ name = "CoolTrainerEX", email = "cooltrainerex@gmail.com" }]
 requires-python = ">=3.14"
 dependencies = [
     "fastapi[standard]>=0.165.0",
+    "httpx>=0.28.1",
     "loguru>=0.8.0",
+    "psycopg[binary]>=3.3.9",
     "pydantic>=2.14.4",
     "pydantic-settings>=2.16.3",
     "sqlmodel>=0.0.50",

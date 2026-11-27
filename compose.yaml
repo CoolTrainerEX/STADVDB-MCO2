@@ -8,11 +8,100 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 services:
-  server:
-    build:
-      context: .
+  db_node1:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ddb_user
+      POSTGRES_PASSWORD: ddb_password
+      POSTGRES_DB: taxi_node1
     ports:
-      - 8000:8000
+      - "5436:5432"
+    volumes:
+      - pgdata_node1:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ddb_user -d taxi_node1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_node2:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ddb_user
+      POSTGRES_PASSWORD: ddb_password
+      POSTGRES_DB: taxi_node2
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata_node2:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ddb_user -d taxi_node2"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  db_node3:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ddb_user
+      POSTGRES_PASSWORD: ddb_password
+      POSTGRES_DB: taxi_node3
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata_node3:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ddb_user -d taxi_node3"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app_node1:
+    build: .
+    depends_on:
+      db_node1:
+        condition: service_healthy
+    environment:
+      NODE_ID: "1"
+      LOCAL_DB_URL: "postgresql+psycopg://ddb_user:ddb_password@db_node1:5432/taxi_node1"
+      NODE1_URL: "http://app_node1:8000"
+      NODE2_URL: "http://app_node2:8000"
+      NODE3_URL: "http://app_node3:8000"
+    ports:
+      - "8001:8000"
+
+  app_node2:
+    build: .
+    depends_on:
+      db_node2:
+        condition: service_healthy
+    environment:
+      NODE_ID: "2"
+      LOCAL_DB_URL: "postgresql+psycopg://ddb_user:ddb_password@db_node2:5432/taxi_node2"
+      NODE1_URL: "http://app_node1:8000"
+      NODE2_URL: "http://app_node2:8000"
+      NODE3_URL: "http://app_node3:8000"
+    ports:
+      - "8002:8000"
+
+  app_node3:
+    build: .
+    depends_on:
+      db_node3:
+        condition: service_healthy
+    environment:
+      NODE_ID: "3"
+      LOCAL_DB_URL: "postgresql+psycopg://ddb_user:ddb_password@db_node3:5432/taxi_node3"
+      NODE1_URL: "http://app_node1:8000"
+      NODE2_URL: "http://app_node2:8000"
+      NODE3_URL: "http://app_node3:8000"
+    ports:
+      - "8003:8000"
+
+volumes:
+  pgdata_node1:
+  pgdata_node2:
+  pgdata_node3:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
@@ -46,4 +135,5 @@ services:
 # secrets:
 #   db-password:
 #     file: db/password.txt
+
 
